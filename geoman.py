@@ -28,7 +28,7 @@ def main():
     parser = optparse.OptionParser(usage=usage, description=description)
     parser.set_defaults(param=None, range=[], atomList=[], scaleIndex=1,
                         countStart=1)
-    parser.add_option('--range', '-r', action='store', type='int', nargs=2, 
+    parser.add_option('--range', '-r', action='store', type='int', nargs=2,
                       dest='range', metavar='R1 R2',
                       help='limit output to geometry range from R1 to R2')
     parser.add_option('--length', '-l', action='callback', type='int', nargs=2,
@@ -70,7 +70,7 @@ def main():
     for i in options.atomList:
         if (abs(i) < options.countStart or i < -traj.noOfAtoms or
             i > traj.noOfAtoms - (1 - options.countStart)):
-            parser.error('invalid atom number: %i' % i)        
+            parser.error('invalid atom number: %i' % i)
 
     # Determine the range of geometries, taking into account:
     #  - User-supplied range includes final value, python ranges don't
@@ -108,7 +108,7 @@ def main():
     sys.stdout.write('# %s: %s - %i-based counting\n' %
                      (options.param, options.atomList, options.countStart))
     if options.param == 'length':
-        sys.stdout.write('#\n#step      distance\n') 
+        sys.stdout.write('#\n#step      distance\n')
     else:
         sys.stdout.write('#\n#step     angle [deg]       angle [rad]\n')
     for i in range(start, stop):
@@ -149,7 +149,7 @@ def main():
             outOfPlaneDeg = outOfPlaneRad * (180.0 / math.pi)
             sys.stdout.write('%4i   %14.8f   %14.8f\n' %
                              (reportedStep, outOfPlaneDeg, outOfPlaneRad))
-        
+
 
 def callbackParam(option, opt_str, value, parser):
     '''Prevent multiple geometrical parameters being selected.'''

@@ -22,9 +22,9 @@
  The sample can then be used as input to mdfilter.py.
 
  If the --vel option is selected, the velocities corresponding to the
- sampled structures are taken from an MNDO velocity output file and 
- output to a velocity snapshot file (in the same order as the trajectory 
- snapshot file). This can also be used as an input to mdfilter.py if you 
+ sampled structures are taken from an MNDO velocity output file and
+ output to a velocity snapshot file (in the same order as the trajectory
+ snapshot file). This can also be used as an input to mdfilter.py if you
  want to provide initial velocities as well as initial structures.
 
  REQUIREMENTS
@@ -116,21 +116,21 @@ def main():
         else:
             random.seed(options.userRandomSeed)
         if options.userSampleSize is None:
-            sample = range(0, trajFile.noOfGeoms)
+            sample = list(range(0, trajFile.noOfGeoms))
             random.shuffle(sample)
         else:
             if options.userSampleSize > trajFile.noOfGeoms:
                 sys.stderr.write('Error: number of sample geometries '
                                  'requested is too large.\n')
                 sys.exit(1)
-            sample = random.sample(range(0, trajFile.noOfGeoms),
+            sample = random.sample(list(range(0, trajFile.noOfGeoms)),
                                    options.userSampleSize)
     else:
         if options.step is None or options.stepStart is None:
             sys.stderr.write('Error: step size or start not known.\n')
             sys.exit(1)
-        sample = range(options.stepStart, trajFile.noOfGeoms,
-                       options.step)
+        sample = list(range(options.stepStart, trajFile.noOfGeoms,
+                       options.step))
         if options.userSampleSize is not None:
             if options.userSampleSize > len(sample):
                 sys.stderr.write('Error: number of sample geometries '
@@ -138,25 +138,25 @@ def main():
                 sys.exit(1)
             else:
                 sample = sample[:options.userSampleSize]
-                     
+
     # Write out the sample
     if options.writeStdOut:
-        sys.stdout.write('Writing sample geometry file...\n')    
+        sys.stdout.write('Writing sample geometry file...\n')
     trajFile.writeSnapshots(sample, options.fileOutSample)
     if options.sampleVelocities:
         if options.writeStdOut:
-            sys.stdout.write('Writing sample velocity file...\n')    
+            sys.stdout.write('Writing sample velocity file...\n')
         velFile.writeSnapshots(sample, options.fileOutVelocities)
-    
+
 
     # Write out the log file
     if options.writeStdOut:
         sys.stdout.write('Writing log file...\n')
     try:
         logFile = open(options.fileOutLog, 'w')
-    except IOError:            
+    except IOError:
         sys.stderr.write("Error: could not open %s" +
-                         "for writing.\n" % options.fileOutLog)    
+                         "for writing.\n" % options.fileOutLog)
     # Command line options
     logFile.write("COMMAND LINE OPTIONS\n")
     for i in sys.argv[1:]:
@@ -164,21 +164,21 @@ def main():
     logFile.write("\n\n")
     # Internal options
     logFile.write("INTERNAL OPTIONS\n")
-    intOptions = options.__dict__.keys()
+    intOptions = list(options.__dict__.keys())
     intOptions.sort()
     for i in intOptions:
         logFile.write(i + ": " + str(options.__dict__[i]) + "\n")
-    logFile.write("\n")    
+    logFile.write("\n")
     # Summary of sampling
     logFile.write("SUMMARY OF SAMPLING\n")
     logFile.write("Sample size: %i\n" % len(sample))
     logFile.close()
-    
+
 
 class GlobalOptions:
-    
+
     """Set and store global options."""
-    
+
     def __init__(self):
         """Set default options."""
         # Program features
@@ -208,7 +208,7 @@ class GlobalOptions:
         try:
             opts, args = getopt.gnu_getopt(sys.argv[1:],
                                            shortOptions, longOptions)
-        except getopt.error, msg:
+        except getopt.error as msg:
             sys.stderr.write("%s\n" % msg)
             sys.stderr.write("for help use --help\n")
             sys.exit(2)
@@ -216,7 +216,7 @@ class GlobalOptions:
         for o, a in opts:
             # Help
             if o in ("-h", "--help"):
-                print __doc__
+                print(__doc__)
                 sys.exit(0)
             # Suppress or switch on features
             if o in ("-q", "--quiet"):
@@ -245,10 +245,10 @@ class GlobalOptions:
                 if self.userSampleSize < 1:
                     sys.stderr.write("Error: sample-size must be greater "
                                      "than zero.\n")
-                    sys.exit(2)                    
+                    sys.exit(2)
             if o == "--random-seed":
                 try:
-                    self.userRandomSeed = int(a)            
+                    self.userRandomSeed = int(a)
                 except ValueError:
                     sys.stderr.write("Error: random-seed must be an integer."
                                      "\n")
@@ -256,23 +256,23 @@ class GlobalOptions:
             if o == "--step":
                 self.random = False
                 try:
-                    self.step = int(a)            
+                    self.step = int(a)
                 except ValueError:
                     sys.stderr.write("Error: step must be an integer.\n")
                     sys.exit(2)
                 if self.step < 1:
                     sys.stderr.write("Error: step must be greater "
                                      "than zero.\n")
-                    sys.exit(2)                   
+                    sys.exit(2)
             if o == "--step-start":
                 try:
-                    self.stepStart = int(a)            
+                    self.stepStart = int(a)
                 except ValueError:
                     sys.stderr.write("Error: step-start must be an integer.\n")
                     sys.exit(2)
                 if self.stepStart < 0:
                     sys.stderr.write("Error: step-start must be positive.\n")
-                    sys.exit(2)  
+                    sys.exit(2)
         # There should be no remaining arguments
         for arg in args:
             sys.stderr.write("Warning: argument '%s' not recognised.\n" % arg)

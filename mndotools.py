@@ -35,9 +35,9 @@ import string
 import sys
 
 class RawFile:
-    
+
     """Hold the contents of an arbitrary file and analyse it."""
-    
+
     def __init__(self, fileName):
         """Load in the entire file as a list."""
         self.fileName = fileName
@@ -72,9 +72,9 @@ class RawFile:
 
 
 class InputFile(RawFile):
-    
+
     """Hold an MNDO input file and analyse it."""
-    
+
     def __init__(self, fileName):
         RawFile.__init__(self, fileName)
 
@@ -116,7 +116,7 @@ class InputFile(RawFile):
         The order of keywords is not important in an MNDO input, but
         it may be convenient to retain the logical order of the original
         input file.
-        
+
         The special case of keywords that are also MOPAC keywords should also
         be noted (e.g. dmax). These must be kept on the fourth line or later,
         otherwise the input file will be recognised by MNDO as a MOPAC input.
@@ -125,13 +125,13 @@ class InputFile(RawFile):
                          else leave them as they were in the original file.
                          Forcing a change of case prevents accidental multiple
                          storage of the same keyword with different cases.
-                         
+
         WARNING: This routine supports only MNDO keyword=value options.
                  'Standard input' and 'MOPAC input' are NOT supported.
- 
+
         """
         mndoKeyOrder = []
-        mndoKeyVals = {}        
+        mndoKeyVals = {}
         lastOptionLine = self.getLastOptionLine()
         for line in self.fileContents[:lastOptionLine + 1]:
             for rawPair in line.split():
@@ -149,7 +149,7 @@ class InputFile(RawFile):
                 val = kwPair[1]
                 if forceLowerCase:
                     key = key.lower()
-                if mndoKeyVals.has_key(key):
+                if key in mndoKeyVals:
                     sys.stderr.write("Warning: already defined keyword (%s) "
                                      "ignored.\n" % key)
                 else:
@@ -182,7 +182,7 @@ class InputFile(RawFile):
                                  int(rawLine[8])-1,
                                  int(rawLine[9])-1)
         return internalGeom
-            
+
 
 class DynvarFile(RawFile):
 
@@ -218,34 +218,34 @@ class DynvarFile(RawFile):
             sys.stderr.write("Warning: last line of dynvar file does not "
                              "contain '/'.\n")
         for line in self.fileContents[1:-1]:
-                kwPair = line.split('=')
-                if len(kwPair) != 2:
-                    sys.stderr.write("Warning: badly formatted keyword (%s) "
-                                     "ignored.\n" % line.strip())
-                    continue
-                kwPair[0] = kwPair[0].strip()
-                kwPair[1] = kwPair[1].strip(string.whitespace + ',')
-                if kwPair[0] == '' or kwPair[1] == '':
-                    sys.stderr.write("Warning: badly formatted keyword (%s) "
-                                     "ignored.\n" % line.strip())
-                    continue
-                key = kwPair[0]
-                val = kwPair[1]
-                if forceUpperCase:
-                    key = key.upper()
-                if dynvarKeyVals.has_key(key):
-                    sys.stderr.write("Warning: already defined keyword (%s) "
-                                     "ignored.\n" % key)
-                else:
-                    dynvarKeyVals[key] = val
-                    dynvarKeyOrder.append(key)
+            kwPair = line.split('=')
+            if len(kwPair) != 2:
+                sys.stderr.write("Warning: badly formatted keyword (%s) "
+                                 "ignored.\n" % line.strip())
+                continue
+            kwPair[0] = kwPair[0].strip()
+            kwPair[1] = kwPair[1].strip(string.whitespace + ',')
+            if kwPair[0] == '' or kwPair[1] == '':
+                sys.stderr.write("Warning: badly formatted keyword (%s) "
+                                 "ignored.\n" % line.strip())
+                continue
+            key = kwPair[0]
+            val = kwPair[1]
+            if forceUpperCase:
+                key = key.upper()
+            if key in dynvarKeyVals:
+                sys.stderr.write("Warning: already defined keyword (%s) "
+                                 "ignored.\n" % key)
+            else:
+                dynvarKeyVals[key] = val
+                dynvarKeyOrder.append(key)
         return (dynvarKeyOrder, dynvarKeyVals)
 
 
 class OutputFile(RawFile):
-    
+
     """Hold an MNDO output file and analyse it."""
-    
+
     def __init__(self, fileName):
         RawFile.__init__(self, fileName)
 
@@ -283,7 +283,7 @@ class OutputFile(RawFile):
         # skip to the real data
         mapLineNo += 4
         # Find the nearest eigenvalue info afterwards
-        header = 'MO     EIGENVALUE     LABEL   NSYM  IMOSYM     OCC.    ACTIVE' 
+        header = 'MO     EIGENVALUE     LABEL   NSYM  IMOSYM     OCC.    ACTIVE'
         eigenvalueLineNo = self.searchForString(header, False, mapLineNo)
         if eigenvalueLineNo == -1:
             sys.stderr.write("Warning: could not find eigenvalue "
@@ -300,30 +300,30 @@ class OutputFile(RawFile):
         if len(line) == 0:
             sys.stderr.write("Warning: could not recognise eigenvalue "
                              + "information formatting (missing?).\n")
-            return None            
+            return None
         while len(line) > 0:
             # Test our assumptions about formatting
             if int(line[0]) != mo:
                 sys.stderr.write("Warning: could not recognise eigenvalue "
                              + "information formatting (MO).\n")
-                return None                
+                return None
             if len(line) != dataLineCols:
                 sys.stderr.write("Warning: could not recognise eigenvalue "
                              + "information formatting (no. of cols).\n")
-                return None          
+                return None
             # If active, add to list of active orbitals
             if str(line[6]) != '-':
                 activeOrbitals.append(mo)
             mo += 1
             eigenvalueLineNo += 1
-            line = self.fileContents[eigenvalueLineNo].split()            
+            line = self.fileContents[eigenvalueLineNo].split()
         # Now get overlap information
         dataLineCols = 4
         line = self.fileContents[mapLineNo].split()
         if len(line) == 0:
             sys.stderr.write("Warning: could not recognise matched active "
                              + "orbital info formatting (missing?).\n")
-            return None                    
+            return None
         orb = 0
         while len(line) > 0 and orb < len(activeOrbitals):
             if len(line) != dataLineCols:
@@ -336,13 +336,13 @@ class OutputFile(RawFile):
                 mapOverlap.append(float(line[3]))
                 orb += 1
                 mapLineNo += 1
-                line = self.fileContents[mapLineNo].split()                
+                line = self.fileContents[mapLineNo].split()
         while orb < len(activeOrbitals):
             mapOverlap.append(0.0)
-            orb += 1 
+            orb += 1
         return (activeOrbitals, mapOverlap)
-                
-        
+
+
     def getTransitionProperties(self, formalism, findFinal):
         """Extract transition properties.
 
@@ -410,14 +410,14 @@ class OutputFile(RawFile):
 
 
 class XYZFile(RawFile):
-    
+
     """Hold an XYZ file containing one or more XYZ structures.
 
     XYZFile can also be initialised with the filename of a Molden trajectory.
     The XYZ information in the Molden file will be automatically extracted.
 
     """
-    
+
     def __init__(self, fileName):
         RawFile.__init__(self, fileName)
         # Load in periodic table for future use
@@ -446,10 +446,10 @@ class XYZFile(RawFile):
                              "XYZ file is <= 0.\n")
         # Remove any information after the XYZ geometries in a Molden file
         if moldenFile:
-            atomLine = self.noOfAtoms + 2  
+            atomLine = self.noOfAtoms + 2
             while atomLine < len(self.fileContents):
                 if self.fileContents[atomLine].find('[') != -1:
-                    # New Molden section found
+                # New Molden section found
                     break
                 atomLine += (self.noOfAtoms + 2)
             if atomLine < len(self.fileContents):
@@ -467,7 +467,7 @@ class XYZFile(RawFile):
 
         geomNumber - specifies which geometry in the file should be parsed
                      (numbered from 0)
-        
+
         Return None if the XYZ data could not be parsed.
 
         """
@@ -533,9 +533,9 @@ class XYZFile(RawFile):
                 f.write(self.fileContents[startLine + i])
         f.close()
 
-            
+
 class XYZGeom:
-    
+
     """Hold a cartesian geometry.
 
     This class provides methods to calculate useful structural quantities
@@ -586,7 +586,7 @@ class XYZGeom:
 
         # dot product
         dotp = v1.dotProduct(v2)
- 
+
         # angle in radians
         ang = math.pi - math.acos(dotp)
         if degrees:
@@ -624,11 +624,11 @@ class XYZGeom:
         # angle in radians
         # using sin as we are actually calculating the angle
         # to the normal of the plane rather than the plane itself.
-        ang = math.asin(dotp)        
+        ang = math.asin(dotp)
         if degrees:
             ang *= (180.0 / math.pi)
-        return ang   
-                   
+        return ang
+
     def getDihedralAngle(self, a1, a2, a3, a4, degrees=True, signed=False):
         """Return the dihedral angle a1-a2-a3-a4.
 
@@ -680,7 +680,7 @@ class XYZGeom:
                 ang = -ang
         if degrees:
             ang *= (180.0 / math.pi)
-        return ang        
+        return ang
 
     def writeXYZGeom(self, title='', symbols=False):
         """Return the geometry in XYZ format
@@ -801,14 +801,14 @@ class XYZPoint:
         """Overloads the '-' operator to subtract two vectors."""
         newX = self.x - other.x
         newY = self.y - other.y
-        newZ = self.z - other.z        
+        newZ = self.z - other.z
         return XYZPoint(newX, newY, newZ)
 
     def __isub__(self, other):
         """Overloads the '-=' operator to subtract other from self in place."""
         self.x -= other.x
         self.y -= other.y
-        self.z -= other.z        
+        self.z -= other.z
 
     def scale(self, factor):
         """Return the vector multiplied by a scalar factor."""
@@ -816,7 +816,7 @@ class XYZPoint:
         newX = self.x * factor
         newY = self.y * factor
         newZ = self.z * factor
-        return XYZPoint(newX, newY, newZ)        
+        return XYZPoint(newX, newY, newZ)
 
     def dotProduct(self, other):
         """Returns the dot (scalar) product of two vectors."""
@@ -828,7 +828,7 @@ class XYZPoint:
         newX = (self.y * other.z) - (self.z * other.y)
         newY = (self.z * other.x) - (self.x * other.z)
         newZ = (self.x * other.y) - (self.y * other.x)
-        return XYZPoint(newX, newY, newZ)   
+        return XYZPoint(newX, newY, newZ)
 
     def getNorm(self):
         """Return the euclidean norm of the vector."""
@@ -847,7 +847,7 @@ class XYZPoint:
         except ZeroDivisionError:
             normFactor = 1.0
         return self.scale(normFactor)
-        
+
 
 class ZMatrixGeom:
 
@@ -901,7 +901,7 @@ class ZMatrixGeom:
                          "0.0           0         " +
                          "0.0           0         " +
                          "0.0           0   0   0   0")
-        return inputGeom            
+        return inputGeom
 
     def buildXYZGeom(self):
         """Return an XYZGeom object equivalent to the ZMatrixGeom object.
@@ -976,16 +976,16 @@ class ZMatrixPoint:
         self.dihedral = float(dihedral)
         self.lconn = int(lconn)
         self.aconn = int(aconn)
-        self.dconn = int(dconn)       
+        self.dconn = int(dconn)
 
 
 class VelocityFile(RawFile):
-    
+
     """Hold a velocity file containing one or more velocities
        in XYZ format.
 
     """
-    
+
     def __init__(self, fileName):
         RawFile.__init__(self, fileName)
         noOfAtoms = 0
@@ -1008,7 +1008,7 @@ class VelocityFile(RawFile):
 
         velNumber - specifies which velocity set in the file should be parsed
                      (numbered from 0)
-        
+
         Return None if the XYZ data could not be parsed.
 
         """
@@ -1062,7 +1062,7 @@ class VelocityFile(RawFile):
 
 
 class XYZVelocity:
-    
+
     """Hold a set of atom velocities in Cartesian coordinates."""
 
     def __init__(self):
@@ -1093,7 +1093,7 @@ class XYZVelocity:
 
 
 class PeriodicTable:
-    
+
     """Hold a list of element names and a dictionary of atomic numbers."""
 
     def __init__(self):
@@ -1132,7 +1132,7 @@ class PeriodicTable:
 
     def getZ(self, symbol):
         """Return an atomic number given an atomic symbol"""
-        if self.atomicNumbers.has_key(symbol):
+        if symbol in self.atomicNumbers:
             return self.atomicNumbers[symbol]
         else:
             return None

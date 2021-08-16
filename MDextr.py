@@ -80,12 +80,12 @@ class ifile:
             self.__file_cont = file.readlines()
             file.close()
         except:
-            print "I can not read file %s\n" % filename
+            print("I can not read file %s\n" % filename)
             self.excod = False
-        
+
 
     def print_file(self):
-        print self.__file_cont
+        print(self.__file_cont)
 
 
     def inline_str(self,stringa,pos):
@@ -149,33 +149,33 @@ class ofile:
 #---------------#
 
     def __init__(self,filename):
-            self.filename = filename
-            
+        self.filename = filename
+
 
     def pr(self,stringa):
         try:
             self = open(self.filename,'w')
         except:
-            print "I can not create file %s\n" % self.filename
+            print("I can not create file %s\n" % self.filename)
             sys.stderr.write("Abnormal termination in ofile\n")
             sys.exit(1)
         self.write(stringa)
-        
+
 
     def outpr(self,lista):
         try:
             self = open(self.filename,'w')
         except:
-            print "I can not create file %s\n" % self.filename
+            print("I can not create file %s\n" % self.filename)
             sys.stderr.write("Abnormal termination in ofile\n")
             sys.exit(1)
         for i in range(len(lista)):
             stringa = str(i+1) + "    " + lista[i] + "\n"
             self.write(stringa)
         self.close()
-            
-    
-#-----------------------------------------------------------#    
+
+
+#-----------------------------------------------------------#
 #-----------------------------------------------------------#
 
 #----------------------#
@@ -204,7 +204,7 @@ def line_arg():
 
 #  Read command line options
     clo = sys.argv
-    
+
 
     j = 1
     while j < len(clo):
@@ -242,8 +242,8 @@ def line_arg():
             help()
             sys.exit(0)
         else:
-            print "\n%s is not a valid option" % op
-            print "Use -h or --help for help\n"
+            print("\n%s is not a valid option" % op)
+            print("Use -h or --help for help\n")
             sys.stderr.write("Abnormal termination in MDextr\n")
             sys.exit(1)
 
@@ -262,36 +262,36 @@ def line_arg():
 
 def help():
 
-# this function prints the help 
+# this function prints the help
 
-    print
-    print "  +----------------+"
-    print "  | MDextr -- HELP |"
-    print "  +----------------+"
-    print
-    print "MDextr extracts data from the output files \n"
-    print "of a surface hopping run"
-    print
-    print "USAGE:   MDextr.py [options]"
-    print "  options:"
-    print "    --mndo-in <file>        MNDO input file name"
-    print "                            (default: mndo.inp)"
-    print "    --dynvar <file>         dynamics input file name"
-    print "                            (default: dynvar.in)"
-    print "    --hop-file <file>       hopping file name"
-    print "                            (default: hopping.out)"
-    print "    --mndo-out <file>       MNDO output file name"
-    print "                            (default: mndo.out)"
-    print "    -o or --out-dir <name>  prefix for output directory name"
-    print "                            (default: MD_data)"
-    print "    -n or --nonumCC         do not extract numerical CC"
-    print "                            (by default extracted if both"
-    print "                             analytical and numerical couplings"
-    print "                             have been computed)"
-    print "    -h or --help            display this help"
-    print
+    print()
+    print("  +----------------+")
+    print("  | MDextr -- HELP |")
+    print("  +----------------+")
+    print()
+    print("MDextr extracts data from the output files \n")
+    print("of a surface hopping run")
+    print()
+    print("USAGE:   MDextr.py [options]")
+    print("  options:")
+    print("    --mndo-in <file>        MNDO input file name")
+    print("                            (default: mndo.inp)")
+    print("    --dynvar <file>         dynamics input file name")
+    print("                            (default: dynvar.in)")
+    print("    --hop-file <file>       hopping file name")
+    print("                            (default: hopping.out)")
+    print("    --mndo-out <file>       MNDO output file name")
+    print("                            (default: mndo.out)")
+    print("    -o or --out-dir <name>  prefix for output directory name")
+    print("                            (default: MD_data)")
+    print("    -n or --nonumCC         do not extract numerical CC")
+    print("                            (by default extracted if both")
+    print("                             analytical and numerical couplings")
+    print("                             have been computed)")
+    print("    -h or --help            display this help")
+    print()
 
-#-----------------------------------------------------------#    
+#-----------------------------------------------------------#
 #-----------------------------------------------------------#
 
 
@@ -316,11 +316,11 @@ num_cc = la[5]
 
 # Header
 
-print
-print "           +----------------------+"
-print "           |        MDextr        |"
-print "           +----------------------+"
-print
+print()
+print("           +----------------------+")
+print("           |        MDextr        |")
+print("           +----------------------+")
+print()
 
 
 
@@ -332,17 +332,17 @@ print
 mnin = ifile(mnin_file)
 
 if mnin.excod:
-    
+
     # read NCIGRD
     tmp = mnin.inline_str('ncigrd',0)
     if tmp == []:
         tmp = mnin.inline_str('NCIGRD',0)
         if tmp == []:
-            print "No keyword NCIGRD in MNDO input file!"
+            print("No keyword NCIGRD in MNDO input file!")
             sys.exit(2)
     tmp2 = string.split(tmp[0],'=')
     ncigrd = tmp2[1]
-        
+
 
 
     # read iroot
@@ -350,7 +350,7 @@ if mnin.excod:
     if tmp == []:
         tmp = mnin.inline_str('IROOT',0)
         if tmp == []:
-            print "No keyword IROOT in MNDO input file!"
+            print("No keyword IROOT in MNDO input file!")
             sys.exit(2)
     tmp2 = string.split(tmp[0],'=')
     iroot = tmp2[1]
@@ -382,14 +382,14 @@ else:
 dynvarin = ifile(dynvar_file)
 
 if dynvarin.excod:
-    
+
 # read IOUT
     tmp = dynvarin.inline_str('IOUT',2)
     if tmp == []:
         tmp = dynvarin.inline_str('iout',2)
         if tmp == []:
-            print "No keyword IOUT in dynvar file!"
-            print "Assumed IOUT=0\n"
+            print("No keyword IOUT in dynvar file!")
+            print("Assumed IOUT=0\n")
             iout = 0
         else:
             pass
@@ -404,7 +404,7 @@ if dynvarin.excod:
     if tmp == []:
         tmp = dynvarin.inline_str('nstep',2)
         if tmp == []:
-            print "No keyword NSTEP in dynvar file!\n"
+            print("No keyword NSTEP in dynvar file!\n")
     tmp2 = tmp[0]
     ln = len(tmp2)
     nstep = tmp2[0:ln-1]
@@ -412,15 +412,15 @@ if dynvarin.excod:
 
 
     if num_cc == True:
-        
+
 # read NUM_CC
         num_cc = False
         tmp = dynvarin.inline_str('NUM_CC',2)
         if tmp == []:
             tmp = dynvarin.inline_str('num_cc',2)
             if tmp == []:
-                print "No keyword NUM_CC in dynvar file!"
-                print "Assumed NUM_CC = F\n"
+                print("No keyword NUM_CC in dynvar file!")
+                print("Assumed NUM_CC = F\n")
                 tmp = "F"
         tmp2 = tmp[0]
         if tmp2 == "T,":
@@ -433,21 +433,21 @@ if dynvarin.excod:
     if tmp == []:
         tmp = dynvarin.inline_str('an_cc',2)
         if tmp == []:
-            print "No keyword AN_CC in dynvar file!"
-            print "Assumed AN_CC = F\n"
+            print("No keyword AN_CC in dynvar file!")
+            print("Assumed AN_CC = F\n")
             tmp = "F"
     tmp2 = tmp[0]
     if tmp2 == "T,":
         an_cc = True
 
 else:
-    print "Assumed IOUT = 0"
+    print("Assumed IOUT = 0")
     iout = 0
-    print "Assumed NUM_CC = F"
+    print("Assumed NUM_CC = F")
     num_cc = False
-    print "Assumed AN_CC = F"
+    print("Assumed AN_CC = F")
     an_cc = False
-    print
+    print()
 #.............................#
 
 
@@ -460,94 +460,94 @@ else:
 hopout = ifile(hop_file)
 
 if hopout.excod:
-    
+
 # read state
-    print "Extracting: state\n"
+    print("Extracting: state\n")
     state = hopout.inline_str('state:',1)
 #print state
 
 
 # read energy
-    print "Extracting: E1\n"
+    print("Extracting: E1\n")
     E1 = hopout.outline_str('mdstep:',1,2)
-    print "Extracting: E2\n"
+    print("Extracting: E2\n")
     E2 = hopout.outline_str('mdstep:',1,3)
     if (ncigrd == "3" or ncigrd == "4"):
-        print "Extracting: E3\n"    
+        print("Extracting: E3\n")
         E3 = hopout.outline_str('mdstep:',1,4)
         if ncigrd == "4":
-            print "Extracting: E4\n"    
+            print("Extracting: E4\n")
             E4 = hopout.outline_str('mdstep:',2,2)
 
 
 # read energy differences
-    print "Extracting: E12\n"
+    print("Extracting: E12\n")
     E12 = hopout.outline_str('differences',1,1)
     if (ncigrd == "3" or ncigrd == "4"):
-        print "Extracting: E13\n"    
+        print("Extracting: E13\n")
         E13 = hopout.outline_str('differences',2,1)
-        print "Extracting: E23\n"   
+        print("Extracting: E23\n")
         E23 = hopout.outline_str('differences',2,2)
         if ncigrd == "4":
-            print "Extracting: E14\n"    
+            print("Extracting: E14\n")
             E14 = hopout.outline_str('differences',3,1)
-            print "Extracting: E24\n"    
+            print("Extracting: E24\n")
             E24 = hopout.outline_str('differences',3,2)
-            print "Extracting: E34\n"    
+            print("Extracting: E34\n")
             E34 = hopout.outline_str('differences',3,3)
 
 
 # read coupling (analitical or numerical)
-    print "Extracting: CC12\n"
+    print("Extracting: CC12\n")
     CC12 = hopout.outline_str('coupling',1,1)
     if (ncigrd == "3" or ncigrd == "4"):
-        print "Extracting: CC13\n"
+        print("Extracting: CC13\n")
         CC13 = hopout.outline_str('coupling',2,1)
-        print "Extracting: CC23\n"
+        print("Extracting: CC23\n")
         CC23 = hopout.outline_str('coupling',2,2)
         if ncigrd == "4":
-            print "Extracting: CC14\n"    
+            print("Extracting: CC14\n")
             CC14 = hopout.outline_str('coupling',3,1)
-            print "Extracting: CC24\n"    
+            print("Extracting: CC24\n")
             CC24 = hopout.outline_str('coupling',3,2)
-            print "Extracting: CC34\n"    
+            print("Extracting: CC34\n")
             CC34 = hopout.outline_str('coupling',3,3)
 
 
 # read population
-    print "Extracting: pop1\n"
+    print("Extracting: pop1\n")
     pop1 = hopout.outline_str('population',1,1)
-    print "Extracting: pop2\n"
+    print("Extracting: pop2\n")
     pop2 = hopout.outline_str('population',2,1)
     if (ncigrd == "3" or ncigrd == "4"):
-        print "Extracting: pop3\n"
+        print("Extracting: pop3\n")
         pop3 = hopout.outline_str('population',3,1)
         if ncigrd == "4":
-            print "Extracting: pop4\n"    
+            print("Extracting: pop4\n")
             pop4 = hopout.outline_str('population',4,1)
 
 
 # read probability
-    print "Extracting: prob1\n"
+    print("Extracting: prob1\n")
     prob1 = hopout.outline_str('probability',1,2)
-    print "Extracting: prob2\n"
+    print("Extracting: prob2\n")
     prob2 = hopout.outline_str('probability',2,2)
     if (ncigrd == "3" or ncigrd == "4"):
-        print "Extracting: prob3\n"
+        print("Extracting: prob3\n")
         prob3 = hopout.outline_str('probability',3,2)
         if ncigrd == "4":
-            print "Extracting: prob4\n"    
+            print("Extracting: prob4\n")
             prob4 = hopout.outline_str('probability',4,2)
 
 
 # read random number
-    print "Extracting: rnd_num\n"
+    print("Extracting: rnd_num\n")
     rnd = hopout.inline_str("rnd",2)
 
 else:
 
     sys.stderr.write("Abnormal termination in ifile\n")
-    sys.exit(1)   
+    sys.exit(1)
 #.............................#
 
 
@@ -563,21 +563,21 @@ if num_cc and an_cc:
     outf = ifile(mnout_file)
 
     if outf.excod:
-    
+
 # read numerical nonadiabatic coupling
-        print "Extracting: num_CC12\n"
+        print("Extracting: num_CC12\n")
         num_CC12 = outf.outline_str("Numerical non-adiabatic",2,2)
         if ncigrd == "3":
-            print "Extracting: num_CC13\n"
+            print("Extracting: num_CC13\n")
             num_CC13 = outf.outline_str("Numerical non-adiabatic",2,3)
-            print "Extracting: num_CC23\n" 
+            print("Extracting: num_CC23\n")
             num_CC23 = outf.outline_str("Numerical non-adiabatic",3,2)
 
     else:
-        print "Numerical coupling will be not extracted\n"
+        print("Numerical coupling will be not extracted\n")
         num_cc = False
-#.............................#     
-    
+#.............................#
+
 
 
 
@@ -591,14 +591,14 @@ if num_cc and an_cc:
 test_dir = outdir
 i = 0
 while os.path.isdir(test_dir):
-    i = i + 1    
+    i = i + 1
     test_dir = outdir + str(i)
 outdir = test_dir
 os.mkdir(outdir)
 
 tmpoutdir = "./" + outdir
-print
-print "Data will be saved in: %s\n" %tmpoutdir
+print()
+print("Data will be saved in: %s\n" %tmpoutdir)
 
 
 
@@ -698,4 +698,3 @@ if num_cc and an_cc:
         out.outpr(num_CC13)
         out = ofile("num_CC23.dat")
         out.outpr(num_CC23)
-

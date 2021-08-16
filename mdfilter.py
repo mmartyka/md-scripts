@@ -286,7 +286,7 @@
 import sys
 import getopt
 import os
-import commands
+import subprocess
 import random
 import math
 import mndotools
@@ -377,12 +377,12 @@ def main():
             # Delete output from memory - no longer needed
             sys.stdout.write(" State     Energy      Ediff       OscStr       Ratio\n")
             for state in templateMol.excitedStates:
-              sys.stdout.write("%4s   %10.6f  %10.6f  %10.6f  %10.6f  \n" % (
-                    state, sampleMols[i].excitedStateEnergies[state],
-                    sampleMols[i].excitedStateEnergies[state]-
-                    templateMol.excitedStateEnergies[state],
-                    sampleMols[i].oscillatorStrengths[state],
-                    sampleMols[i].ose2Ratio[state]))
+                sys.stdout.write("%4s   %10.6f  %10.6f  %10.6f  %10.6f  \n" % (
+                      state, sampleMols[i].excitedStateEnergies[state],
+                      sampleMols[i].excitedStateEnergies[state]-
+                      templateMol.excitedStateEnergies[state],
+                      sampleMols[i].oscillatorStrengths[state],
+                      sampleMols[i].ose2Ratio[state]))
             sampleMols[i].output = None
             if options.writeStdOut:
                 sys.stdout.write("\n")
@@ -425,26 +425,26 @@ def main():
     # Filter by transition probability
     maxRatio = 0.0
     if options.writeStdOut and options.filterProb:
-	sys.stdout.write("Filtering by transition probability...\n")
+        sys.stdout.write("Filtering by transition probability...\n")
     # First we find the maximum value of the ratio for transition
     # to any state
     # We assume here that each sample molecule has the same number of
     # states as the template molecule (reasonable as that's why it's
     # a template molecule!)
     for i in range(sampleXYZ.noOfGeoms):
-	for state in templateMol.excitedStates:
-	    if sampleMols[i].selected[state]:
-		if sampleMols[i].ose2Ratio[state] > maxRatio:
-		    maxRatio = sampleMols[i].ose2Ratio[state]
+        for state in templateMol.excitedStates:
+            if sampleMols[i].selected[state]:
+                if sampleMols[i].ose2Ratio[state] > maxRatio:
+                    maxRatio = sampleMols[i].ose2Ratio[state]
     # Now we calculate the probability for each state and
     # filter by stochastic algorithm
     # First we set the seed
     if options.probUseSeed:
-	random.seed(options.probSeed)
+        random.seed(options.probSeed)
     else:
-	random.seed()
+        random.seed()
     for i in range(sampleXYZ.noOfGeoms):
-	sampleMols[i].filterProb(maxRatio,options.filterProb)
+        sampleMols[i].filterProb(maxRatio,options.filterProb)
 
     # Summarise the filtering
     sumState = {}
@@ -489,7 +489,7 @@ def main():
                 # Write geometry
                 title = "G" + str(i) + " S" + str(state)
                 if options.filterMapthr:
-                        title = title + " O" + str(sampleMols[i].activeOrbitals)
+                    title = title + " O" + str(sampleMols[i].activeOrbitals)
                 xyzGeom = sampleMols[i].xyzGeom.writeXYZGeom(title, False)
                 for j in range(len(xyzGeom)):
                     spectrumFile.write(xyzGeom[j] + "\n")
@@ -511,7 +511,7 @@ def main():
         logFile.write("\n\n")
         # Internal options
         logFile.write("INTERNAL OPTIONS\n")
-        intOptions = options.__dict__.keys()
+        intOptions = list(options.__dict__.keys())
         intOptions.sort()
         for i in intOptions:
             logFile.write(i + ": " + str(options.__dict__[i]) + "\n")
@@ -566,10 +566,10 @@ def main():
         dynvar = mndotools.DynvarFile(options.fileInpDynvar)
         (dynvarKeyOrder, dynvarKeyVals) = dynvar.parseNamelist(True)
         # Add an init_stat entry if there isn't one already
-        if not dynvarKeyVals.has_key('INIT_STAT'):
+        if 'INIT_STAT' not in dynvarKeyVals:
             dynvarKeyOrder.append('INIT_STAT')
         # Add a restart entry if there isn't one already
-        if not dynvarKeyVals.has_key('RESTART'):
+        if 'RESTART' not in dynvarKeyVals:
             dynvarKeyOrder.append('RESTART')
         # Overwrite init_stat even it is already present, so we know
         # that there will be a crash if it isn't set properly
@@ -620,9 +620,9 @@ def main():
                     if len(options.mdUserStates) > 0:
                         gradients = options.mdUserStates
                     elif options.allStates:
-                        gradients = range(1, templateMol.excitedStates[-1] + 1)
+                        gradients = list(range(1, templateMol.excitedStates[-1] + 1))
                     else:
-                        gradients = range(1, options.targetState + 1)
+                        gradients = list(range(1, options.targetState + 1))
                     inpFileName = '%s/mndo.inp' % dirname
                     title = "Geom %i, State %i\n" % (i, state) + \
                             "Generated automatically by mdfilter.py\n"
@@ -668,20 +668,20 @@ def main():
         if options.writeStdOut:
             sys.stdout.write("Writing spectrum file...\n")
         for state in sampleMols[1].excitedStates:
-	    histogram = {}
-	    for i in range(sampleXYZ.noOfGeoms):
-		if sampleMols[i].selected[state]:
-		    # Bins are stored as the integer multiple of the bin
-		    # size to avoid floating point issues
-		    energy = sampleMols[i].excitedStateEnergies[state]
-		    count = int(round(energy / options.spectrumBinSize))
-		    if histogram.has_key(count):
-			histogram[count] += sampleMols[i].transProb[state]
-		    else:
-			histogram[count] = sampleMols[i].transProb[state]
-	    # Print out the data from the lowest bin to the highest
-	    if len(histogram)>0:
-                bins = histogram.keys()
+            histogram = {}
+            for i in range(sampleXYZ.noOfGeoms):
+                if sampleMols[i].selected[state]:
+                    # Bins are stored as the integer multiple of the bin
+                    # size to avoid floating point issues
+                    energy = sampleMols[i].excitedStateEnergies[state]
+                    count = int(round(energy / options.spectrumBinSize))
+                    if count in histogram:
+                        histogram[count] += sampleMols[i].transProb[state]
+                    else:
+                        histogram[count] = sampleMols[i].transProb[state]
+            # Print out the data from the lowest bin to the highest
+            if len(histogram)>0:
+                bins = list(histogram.keys())
                 bins.sort()
                 # Put in dummy zero bins at both ends
                 lowest = bins[0] - 1
@@ -700,7 +700,7 @@ def main():
                 for i in range(lowest, highest + 1):
                     realBin = i * options.spectrumBinSize
                     wavelength = 1239.8419/realBin
-                    if histogram.has_key(i):
+                    if i in histogram:
                         spectrumFile.write("%10.5f %10.5f %10.5f\n"% (realBin, wavelength, histogram[i]))
                     else:
                         spectrumFile.write("%10.5f %10.5f %10.5f\n"% (realBin, wavelength, 0.0))
@@ -721,7 +721,7 @@ class GlobalOptions:
         """Set default options."""
         # MNDO path
         self.mndoPath = '/net/people/plgmmchem/mndo99/mndo99'
-        p = commands.getstatusoutput('which mndo-md')
+        p = subprocess.getstatusoutput('which mndo-md')
         if p[0] == 0:
             self.mndoPath = p[1]
         # Set default options
@@ -778,7 +778,7 @@ class GlobalOptions:
         try:
             opts, args = getopt.gnu_getopt(sys.argv[1:],
                                            shortOptions, longOptions)
-        except getopt.error, msg:
+        except getopt.error as msg:
             sys.stderr.write("%s\n" % msg)
             sys.stderr.write("for help use --help\n")
             sys.exit(2)
@@ -786,7 +786,7 @@ class GlobalOptions:
         for o, a in opts:
             # Help
             if o in ("-h", "--help"):
-                print __doc__
+                print(__doc__)
                 sys.exit(0)
             # Suppress or switch on features
             if o in ("-r", "--refilter"):
@@ -942,7 +942,7 @@ class Mol:
         # We send the output to tmp so it's
         # easier to see what's gone wrong if things go wrong
         cmd = str(mndoPath) + " < " + self.fileName + " > tmp.out"
-        c = commands.getstatusoutput(cmd)
+        c = subprocess.getstatusoutput(cmd)
         # Unfortunately a failed MNDO run usually (or possibly always) give a
         # return value of 0
         # so I'm not sure we will ever see this error
@@ -1009,8 +1009,8 @@ class TemplateMol(Mol):
                             'kmass', 'nmrnuc', 'kgeom',
                             'ksym', 'lroot', 'icimap', 'keepci', 'ncigrd',
                             'icross', 'jop', 'mapthr' ]
-        for testKey in mandatoryVals.keys():
-            if not self.keyVals.has_key(testKey):
+        for testKey in list(mandatoryVals.keys()):
+            if testKey not in self.keyVals:
                 sys.stderr.write("Error: mandatory option %s missing from "
                                  "template file.\n" % testKey)
                 sane = False
@@ -1019,8 +1019,8 @@ class TemplateMol(Mol):
                                  "is wrong (should be %s).\n"
                                  % testKey, mandatoryVals[testKey])
                 sane = False
-        for testKey in mandatoryMinVals.keys():
-            if not self.keyVals.has_key(testKey):
+        for testKey in list(mandatoryMinVals.keys()):
+            if testKey not in self.keyVals:
                 sys.stderr.write("Error: mandatory option %s missing from "
                                  "template file.\n" % testKey)
                 sane = False
@@ -1030,7 +1030,7 @@ class TemplateMol(Mol):
                                  % testKey, mandatoryMinVals[testKey])
                 sane = False
         for testKey in mandatoryAbsent:
-            if self.keyVals.has_key(testKey):
+            if testKey in self.keyVals:
                 sys.stderr.write("Error: option %s must not be present in "
                                  "template file.\n" % testKey)
                 sane = False
@@ -1061,7 +1061,7 @@ class TemplateMol(Mol):
         # Remove the plus sign later if there are no additions
         tempKeyOrder.append('+')
         for testKey in mandatoryVals:
-            if not tempKeyVals.has_key(testKey):
+            if testKey not in tempKeyVals:
                 tempKeyOrder.append(testKey)
             tempKeyVals[testKey] = mandatoryVals[testKey]
         if tempKeyOrder[-1] == '+':
@@ -1142,7 +1142,7 @@ class SampleMol(Mol):
         # Remove the plus sign later if there are no additions
         sampleKeyOrder.append('+')
         for testKey in mandatoryVals:
-            if not sampleKeyVals.has_key(testKey):
+            if testKey not in sampleKeyVals:
                 sampleKeyOrder.append(testKey)
             sampleKeyVals[testKey] = mandatoryVals[testKey]
         if sampleKeyOrder[-1] == '+':
@@ -1197,7 +1197,7 @@ class SampleMol(Mol):
         # Remove the plus sign later if there are no additions
         dynKeyOrder.append('+')
         for testKey in mandatoryVals:
-            if not dynKeyVals.has_key(testKey):
+            if testKey not in dynKeyVals:
                 dynKeyOrder.append(testKey)
             dynKeyVals[testKey] = mandatoryVals[testKey]
         if dynKeyOrder[-1] == '+':
@@ -1315,17 +1315,17 @@ class SampleMol(Mol):
         # if they should be filtered out
         self.transProb = {}
         for i in self.excitedStates:
-	    if maxRatio > 0.0:
-	      self.transProb[i] = self.ose2Ratio[i] / maxRatio
-	    else:
-	      self.transProb[i] = 0.0
+            if maxRatio > 0.0:
+                self.transProb[i] = self.ose2Ratio[i] / maxRatio
+            else:
+                self.transProb[i] = 0.0
             if not self.selected[i]:
-	      continue
-	    if probFilter:
-	      rnd = random.random()
-	      if rnd > self.transProb[i]:
-		  self.selected[i] = False
-		  self.failCause[i] = 'prob (rnd={:f})'.format(rnd)
+                continue
+            if probFilter:
+                rnd = random.random()
+                if rnd > self.transProb[i]:
+                    self.selected[i] = False
+                    self.failCause[i] = 'prob (rnd={:f})'.format(rnd)
 
 
 class FilterLogFile(mndotools.RawFile):
