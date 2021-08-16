@@ -26,7 +26,7 @@ class data_set:
         # read data
         try:
             data_file = open(filen,"r")
-            print "processing: %s\n" % filen
+            print("processing: %s\n" % filen)
             raw_data = data_file.readlines()
             data_file.close()
 
@@ -40,8 +40,8 @@ class data_set:
                 tmp_dat = string.split(linea)
                 self.data.append(tmp_dat[1])
         except:
-            print
-            print "I can not open file %s\n" % filen
+            print()
+            print("I can not open file %s\n" % filen)
             sys.stderr.write("Abnormal termination in mmean\n")
             sys.exit(1)
 
@@ -105,7 +105,7 @@ class data_set:
             for j in range(n_blocks):
                 tot = tot + float(bin_av[j])
             average = tot / float(n_blocks)
-            # compute blocks variance 
+            # compute blocks variance
             tot = 0.0
             for j in range(n_blocks):
                 tot = tot + (float(bin_av[j])-float(average))*\
@@ -136,7 +136,7 @@ class data_set:
                 # compute total average
                 tmp = 0.0
                 for i in range(nn):
-                   tmp = tmp + float(av[i])
+                    tmp = tmp + float(av[i])
                 average = float(tmp)/float(nn)
                 # compute variance
                 tmp = 0.0
@@ -160,16 +160,16 @@ class data_set:
 
 
 
-#............................................#            
+#............................................#
 
 
 class ensamble:
-    
+
 # This class defines an ensamble of data sets
 
 
     # INITIALIZATION OF THE ENSAMBLE
-    
+
     def __init__(self,file_name):
 
         # read the file list
@@ -178,8 +178,8 @@ class ensamble:
             dflist = lfile.readlines()
             lfile.close()
         except:
-            print
-            print "I can not open file %s\n" % data_file
+            print()
+            print("I can not open file %s\n" % data_file)
             sys.stderr.write("Abnormal termination in mmean\n")
             sys.exit(1)
 
@@ -199,7 +199,7 @@ class ensamble:
             a = self.dati[i]
             N = a.num
             if N > self.N_max:
-               self.N_max = N
+                self.N_max = N
 
         if data_type == "extrapolate":
             for i in range(1,len(dflist)):
@@ -209,11 +209,11 @@ class ensamble:
                 #a.num = N_max
                     for j in range(N,self.N_max):
                         a.data.append(a.data[N-1])
-                    print "Extrapolate state in run {0} from {1} to {2}.".format(i,N,self.N_max)
-            
+                    print("Extrapolate state in run {0} from {1} to {2}.".format(i,N,self.N_max))
 
 
-            
+
+
     # FIND THE AVERAGE VALUE OVER ALL SETS LINE BY LINE
     # AND THE VARIANCE (if var = True)
     def ens_aver(self,var):
@@ -229,11 +229,11 @@ class ensamble:
             for j in range(int(self.nsets)):
                 a = self.dati[j]
                 if data_type == "all":
-                   if a.num <= i:
-                      continue
+                    if a.num <= i:
+                        continue
                 elif data_type == "finished":
-                   if a.num < n:
-                      continue
+                    if a.num < n:
+                        continue
                 num_data = num_data + 1
                 tmp = tmp + float(a.data[i])
             tmp = float(tmp)/float(num_data)
@@ -258,7 +258,7 @@ class ensamble:
 
 
 
-            
+
     # FIND THE AVERAGE OCCUPATION OVER ALL SETS LINE BY LINE
     # AND VARIANCE [ = occ*(1-occ)]
     def ens_occ(self):
@@ -274,7 +274,7 @@ class ensamble:
             if int(a.massimo) > int(nstat):
                 nstat = a.massimo
             self.nst = nstat
-        #find occupations        
+        #find occupations
         for i in range(n):
             #initialize occupation vector
             occ = []
@@ -301,8 +301,8 @@ class ensamble:
                 tmp2.append(float(tmp[k])*(1.0-float(tmp[k])))
             self.en_occ.append(tmp)
             self.en_variance.append(tmp2)
-            
-            
+
+
 
 #-----------------------------------------------------------#
 
@@ -332,7 +332,7 @@ def line_arg():
     out_file = "data.mean"
     off = 0
 
-    
+
 
     opt_list = []
 
@@ -352,7 +352,7 @@ def line_arg():
             j = j + 1
             data_file = clo[j]
             j = j + 1
-            continue            
+            continue
         elif op == "-s" or op == "--state":
             state = True
             j = j + 1
@@ -394,9 +394,9 @@ def line_arg():
             help()
             sys.exit(0)
         else:
-            print "\n%s is not a valid option" % op
-            print "Use -h or --help for help\n"
-            print
+            print("\n%s is not a valid option" % op)
+            print("Use -h or --help for help\n")
+            print()
             sys.stderr.write("Abnormal termination in mmean\n")
             sys.exit(1)
 
@@ -404,33 +404,33 @@ def line_arg():
     # check if options are meaningfull
     if single_file:
         if state:
-            print
-            print "The average state occupation can not be"
-            print "calculated in the single file mode!"
-            print
+            print()
+            print("The average state occupation can not be")
+            print("calculated in the single file mode!")
+            print()
             sys.stderr.write("Abnormal termination in mmean\n")
             sys.exit(2)
     else:
         if do_max or do_min:
-            print
-            print "--max and --min options can only be used in"
-            print "list mode"
-            print
+            print()
+            print("--max and --min options can only be used in")
+            print("list mode")
+            print()
             sys.stderr.write("Abnormal termination in mmean\n")
             sys.exit(2)
     if data_type != "all" and data_type != "finished" and data_type != "extrapolate":
-            print
-            print "wrong input for data_type"
-            print
-            sys.stderr.write("Abnormal termination in mmean\n")
-            sys.exit(2)
-       
+        print()
+        print("wrong input for data_type")
+        print()
+        sys.stderr.write("Abnormal termination in mmean\n")
+        sys.exit(2)
+
 
 
 
     opt_list.append(single_file)
     opt_list.append(infile)
-    opt_list.append(data_file)    
+    opt_list.append(data_file)
     opt_list.append(state)
     opt_list.append(serror)
     opt_list.append(sd_opt)
@@ -440,7 +440,7 @@ def line_arg():
     opt_list.append(out_file)
     opt_list.append(off)
     opt_list.append(data_type)
-    
+
 
     return opt_list
 
@@ -449,77 +449,77 @@ def line_arg():
 
 def help():
 
-    print
-    print "  +----------------+"
-    print "  |  mmean - HELP  |"
-    print "  +----------------+"
-    print
-    print "mmean is a script to compute average and standard"
-    print "deviation on MD files. It can work with single files"
-    print "to compute expetation values from a single MD run"
-    print "or with multiple files (default) to compute averages"
-    print "on several trajectories. In multiple files mode it"
-    print "can be used also to compute the average occupation of"
-    print "states (-s or --state option) after a surface hopping"
-    print "calculation."
-    print
-    print "USAGE:    mmean.py [options]"
-    print "  options:"
-    print "   -f or --file <file>      the single file mode is"
-    print "                            used and file <file> is"
-    print "                            used as source of data."
-    print "                            If not specified the multiple"
-    print "                            file mode is used (default)."
-    print "   -l or --list <file>      Name of the file containing"
-    print "                            the list of files to process."
-    print "                            (default: data.ls)"
-    print "   -s or --state            Average occupation of states"
-    print "                            is computed instead of"
-    print "                            average value."
-    print "                            (default: average value computed)"
-    print "   --s-error                The standard error is also"
-    print "                            computed. For single file mode"
-    print "                            this is done with the iterative"
-    print "                            method of JCP 91, 461."
-    print "                            (default: not performed)"
-    print "   --bin <int>              The standard error is also"
-    print "                            computed. For multiple state"
-    print "                            mode it is identical to --s-error."
-    print "                            For single state mode the binning"
-    print "                            method is used with bin dimension"
-    print "                            = <int>."
-    print "                            (default: not performed)"
-    print "   --max                    Find the maximum value of the set."
-    print "                            Available only in single file mode."
-    print "                            (default: not performed)"
-    print "   --min                    Find the minimum value of the set."
-    print "                            Available only in single file mode."
-    print "                            (default: not performed)"
-    print "   -o or --out-file <file>  Output file name. Only for multiple"
-    print "                            files mode. In single file mode the"
-    print "                            output is directed to standard"
-    print "                            output."
-    print "                            (default: data.mean)"
-    print "   -a or --add-offset <int> Add an offset to the index in the"
-    print "                            output file. Only for multiple"
-    print "                            files mode"
-    print "                            (default: 0)"
-    print "   -h or --help             display this help."
-    print
-    print
-    print " INDEX FILE FORMAT"
-    print
-    print "In multiple files mode the files to be read must be specified"
-    print "in a separate file (eventually with the complete path) with"
-    print "the following format:"
-    print "file1"
-    print "file2"
-    print "  ."
-    print "  ."
-    print "  ."
-    print
-    
-    
+    print()
+    print("  +----------------+")
+    print("  |  mmean - HELP  |")
+    print("  +----------------+")
+    print()
+    print("mmean is a script to compute average and standard")
+    print("deviation on MD files. It can work with single files")
+    print("to compute expetation values from a single MD run")
+    print("or with multiple files (default) to compute averages")
+    print("on several trajectories. In multiple files mode it")
+    print("can be used also to compute the average occupation of")
+    print("states (-s or --state option) after a surface hopping")
+    print("calculation.")
+    print()
+    print("USAGE:    mmean.py [options]")
+    print("  options:")
+    print("   -f or --file <file>      the single file mode is")
+    print("                            used and file <file> is")
+    print("                            used as source of data.")
+    print("                            If not specified the multiple")
+    print("                            file mode is used (default).")
+    print("   -l or --list <file>      Name of the file containing")
+    print("                            the list of files to process.")
+    print("                            (default: data.ls)")
+    print("   -s or --state            Average occupation of states")
+    print("                            is computed instead of")
+    print("                            average value.")
+    print("                            (default: average value computed)")
+    print("   --s-error                The standard error is also")
+    print("                            computed. For single file mode")
+    print("                            this is done with the iterative")
+    print("                            method of JCP 91, 461.")
+    print("                            (default: not performed)")
+    print("   --bin <int>              The standard error is also")
+    print("                            computed. For multiple state")
+    print("                            mode it is identical to --s-error.")
+    print("                            For single state mode the binning")
+    print("                            method is used with bin dimension")
+    print("                            = <int>.")
+    print("                            (default: not performed)")
+    print("   --max                    Find the maximum value of the set.")
+    print("                            Available only in single file mode.")
+    print("                            (default: not performed)")
+    print("   --min                    Find the minimum value of the set.")
+    print("                            Available only in single file mode.")
+    print("                            (default: not performed)")
+    print("   -o or --out-file <file>  Output file name. Only for multiple")
+    print("                            files mode. In single file mode the")
+    print("                            output is directed to standard")
+    print("                            output.")
+    print("                            (default: data.mean)")
+    print("   -a or --add-offset <int> Add an offset to the index in the")
+    print("                            output file. Only for multiple")
+    print("                            files mode")
+    print("                            (default: 0)")
+    print("   -h or --help             display this help.")
+    print()
+    print()
+    print(" INDEX FILE FORMAT")
+    print()
+    print("In multiple files mode the files to be read must be specified")
+    print("in a separate file (eventually with the complete path) with")
+    print("the following format:")
+    print("file1")
+    print("file2")
+    print("  .")
+    print("  .")
+    print("  .")
+    print()
+
+
 #-----------------------------------------------------------#
 #-----------------------------------------------------------#
 
@@ -548,21 +548,21 @@ data_type = la[11]
 
 
 
-print single_file
-print infile
-print serror
-print sd_opt
-print bin
-print do_max
-print do_min
+print(single_file)
+print(infile)
+print(serror)
+print(sd_opt)
+print(bin)
+print(do_max)
+print(do_min)
 
 # Header
 
-print
-print "           +---------------------+"
-print "           |        mmean        |"
-print "           +---------------------+"
-print
+print()
+print("           +---------------------+")
+print("           |        mmean        |")
+print("           +---------------------+")
+print()
 
 
 # SINGLE FILE
@@ -577,7 +577,7 @@ if single_file:
     # compute variance
     if serror:
         ds1.get_sigma(int(bin),int(sd_opt))
-    
+
     # find maximum
     if do_max:
         ds1.max_val()
@@ -587,18 +587,18 @@ if single_file:
         ds1.min_val()
 
     # output
-    print
-    print "Number of points: %6d" % ds1.num
-    print "Average: %13.5f" % ds1.average
+    print()
+    print("Number of points: %6d" % ds1.num)
+    print("Average: %13.5f" % ds1.average)
     if serror:
         tmp = float(ds1.variance)/float(ds1.num)
         tmp = sqrt(float(tmp))
-        print "Standard error: %13.5f" % tmp
+        print("Standard error: %13.5f" % tmp)
     if do_max:
-        print "Max: %13.5f" % ds1.massimo
+        print("Max: %13.5f" % ds1.massimo)
     if do_min:
-        print "Min: %13.5f" %ds1.minimo
-    
+        print("Min: %13.5f" %ds1.minimo)
+
 
 # ENSAMBLE
 
@@ -618,9 +618,9 @@ else:
         e1.ens_aver(i_var)
 
     # output
-    print
-    print "Number of sets: %6d" % e1.nsets
-    print "Number of points per set: %6d" % e1.N_max
+    print()
+    print("Number of sets: %6d" % e1.nsets)
+    print("Number of points per set: %6d" % e1.N_max)
 
     # prepare output file name
     test_file = out_file
@@ -630,14 +630,14 @@ else:
         test_file = out_file + str(i)
     out_file = test_file
 
-    print "Output file: %s" % out_file
+    print("Output file: %s" % out_file)
 
     # open output file
     try:
         ofile = open(out_file,"w")
     except:
-        print
-        print "I can not create file %s\n" % out_file
+        print()
+        print("I can not create file %s\n" % out_file)
         sys.stderr.write("Abnormal termination in mmean\n")
         sys.exit(1)
 
@@ -645,7 +645,7 @@ else:
     # write output
     if state:
         for i in range(int(e1.nst)):   # loop over states
-            j = int(i) + 1 
+            j = int(i) + 1
             ofile.write("#state %d \n" % j)
             for k in range(int(e1.N_max)): # loop over lines
                 tmp = e1.en_occ[k]
@@ -659,7 +659,7 @@ else:
                     ofile.write("%6d   %13.5f \n" \
                                 %(int(k)+1+int(off),float(tmp[i])))
             ofile.write("\n\n")
-            
+
     else:
         for i in range(int(e1.N_max)): # loop over lines
             if serror:
@@ -671,12 +671,7 @@ else:
             else:
                 ofile.write("%6d   %13.5f \n" \
                             %(int(i)+1+int(off),float(e1.en_average[i])))
-        
-
-
-print
 
 
 
-
-        
+print()
