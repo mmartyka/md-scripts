@@ -456,7 +456,7 @@ class XYZFile(RawFile):
                 self.fileContents = self.fileContents[:atomLine]
         # Cursory check of contents
         if len(self.fileContents) % (self.noOfAtoms + 2) == 0:
-            self.noOfGeoms = len(self.fileContents) / (self.noOfAtoms + 2)
+            self.noOfGeoms = int(len(self.fileContents) / (self.noOfAtoms + 2))
         else:
             sys.stderr.write("Error: XYZ file length is not an integer " +
                              "multiple of claimed individual size.\n")
@@ -997,7 +997,7 @@ class VelocityFile(RawFile):
         self.noOfAtoms = noOfAtoms
         # Cursory check of contents
         if len(self.fileContents) % (self.noOfAtoms + 1) == 0:
-            self.noOfGeoms = len(self.fileContents) / (self.noOfAtoms + 1)
+            self.noOfGeoms = int(len(self.fileContents) / (self.noOfAtoms + 1))
         else:
             sys.stderr.write("Error: velocity file length is not an integer " +
                              "multiple of the first entry.\n")
